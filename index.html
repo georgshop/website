@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Georg Shop</title>
+    <title>Georg Tech & Shop</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Firebase SDKs -->
@@ -17,19 +17,29 @@
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
 
-    <!-- Moderner Ambient-Hintergrund (Leuchtende Lichtkugeln) -->
+    <!-- Moderner Ambient-Hintergrund -->
     <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Schöner schwebender Benachrichtigungs-Ballon (Toast) -->
+    <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 ease-out bg-gray-900/90 backdrop-blur-xl border border-indigo-500/50 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-3">
+        <span class="text-2xl">🛍️</span>
+        <div>
+            <p class="font-bold text-sm" id="toastTitle">Zum Warenkorb hinzugefügt!</p>
+            <p class="text-xs text-gray-400" id="toastDesc">Artikel wurde erfolgreich eingepackt.</p>
+        </div>
+    </div>
 
     <!-- Navigation -->
     <header class="border-b border-gray-800/80 bg-gray-900/60 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <button onclick="handleLogoClick()" class="text-2xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent text-left">
-                GEORG<span class="text-white"> SHOP</span>
+                GEORG<span class="text-white"> TECH & SHOP</span>
             </button>
 
             <nav class="flex items-center space-x-6 text-sm font-semibold">
                 <button onclick="showPage('shop')" class="hover:text-indigo-400 transition">Shop</button>
+                <button onclick="showPage('repair')" class="hover:text-indigo-400 transition">Reparatur-Service</button>
                 
                 <div id="authNavContainer">
                     <button onclick="showPage('auth')" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-2xl shadow-lg shadow-indigo-600/20 transition">
@@ -46,27 +56,92 @@
 
     <main class="max-w-7xl mx-auto px-6 py-12 flex-grow w-full space-y-16 relative z-10">
 
-        <!-- SEITE 1: SHOP -->
+        <!-- SEITE 1: SHOP MIT BUNTE KATEGORIEN -->
         <section id="page-shop" class="space-y-8">
-            <div class="text-center max-w-2xl mx-auto space-y-4">
-                <h1 class="text-5xl font-black mb-2 tracking-tight">Willkommen bei <span class="bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent">Georg Shop</span></h1>
-                <p class="text-gray-400 text-lg">Entdecken Sie unsere exklusiven Produkte und Top-Angebote.</p>
+            <div class="text-center max-w-4xl mx-auto space-y-4">
+                <h1 class="text-5xl font-black mb-2 tracking-tight">Willkommen bei <span class="bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent">Georg Tech & Shop</span></h1>
+                <p class="text-gray-400 text-lg">Entdecken Sie unsere große Auswahl an Tech-Zubehör, Ersatzteilen und Gadgets.</p>
                 
-                <!-- Such- und Filterfeld -->
+                <!-- Suche -->
                 <div class="relative max-w-md mx-auto pt-2">
                     <input type="text" id="searchInput" oninput="filterProducts()" placeholder="🔍 Produkte durchsuchen..." class="w-full bg-gray-900/80 backdrop-blur-md border border-gray-800 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-indigo-500 shadow-xl transition">
                 </div>
+
+                <!-- Bunte Kategorien Buttons -->
+                <div class="flex flex-wrap justify-center gap-2.5 pt-4">
+                    <button onclick="setCategoryFilter('all')" class="cat-btn active bg-gradient-to-r from-gray-700 to-gray-800 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg transition transform hover:scale-105">✨ Alle</button>
+                    <button onclick="setCategoryFilter('Handyhüllen')" class="cat-btn bg-gradient-to-r from-pink-600 to-rose-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-pink-600/20 transition transform hover:scale-105">📱 Handyhüllen</button>
+                    <button onclick="setCategoryFilter('Laptops')" class="cat-btn bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition transform hover:scale-105">💻 Laptops</button>
+                    <button onclick="setCategoryFilter('Smart Home')" class="cat-btn bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-purple-600/20 transition transform hover:scale-105">🏠 Smart Home</button>
+                    <button onclick="setCategoryFilter('3D-Druck')" class="cat-btn bg-gradient-to-r from-amber-600 to-orange-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-amber-600/20 transition transform hover:scale-105">🖨️ 3D Gedruckte Teile</button>
+                    <button onclick="setCategoryFilter('Ersatzteile')" class="cat-btn bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/20 transition transform hover:scale-105">🛠️ Ersatzteile</button>
+                    <button onclick="setCategoryFilter('Datenkabel')" class="cat-btn bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-cyan-600/20 transition transform hover:scale-105">🔌 Datenkabel</button>
+                    <button onclick="setCategoryFilter('Ladegeräte')" class="cat-btn bg-gradient-to-r from-yellow-600 to-amber-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-yellow-600/20 transition transform hover:scale-105">⚡ Ladegeräte</button>
+                    <button onclick="setCategoryFilter('Speichermedium')" class="cat-btn bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-fuchsia-600/20 transition transform hover:scale-105">💾 Speichermedium</button>
+                    <button onclick="setCategoryFilter('Drucker & Verbrauchsmaterial')" class="cat-btn bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-red-600/20 transition transform hover:scale-105">🖨️ Drucker & Verbrauchsmaterial</button>
+                </div>
             </div>
             
-            <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+            <!-- Vertikales Produkt-Raster -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </section>
 
-        <!-- SEITE 2: ADMIN PANEL -->
+        <!-- SEITE 2: REPARATUR-SERVICE -->
+        <section id="page-repair" class="hidden max-w-3xl mx-auto space-y-8 bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-black text-indigo-400">🔧 Handy & Laptop Reparatur-Anfrage</h2>
+                <p class="text-gray-400 text-sm">Egal ob Display-Schaden, Akku-Wechsel oder Software-Problem – senden Sie uns eine schnelle Anfrage.</p>
+            </div>
+
+            <form onsubmit="handleRepairRequest(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Ihr Name</label>
+                        <input type="text" id="repName" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">E-Mail / Telefon</label>
+                        <input type="text" id="repContact" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Geräte-Typ</label>
+                        <select id="repType" class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-white focus:outline-none focus:border-indigo-500 transition">
+                            <option value="Smartphone / Handy">Smartphone / Handy</option>
+                            <option value="Laptop / PC">Laptop / PC</option>
+                            <option value="Tablet">Tablet</option>
+                            <option value="Sonstiges">Sonstiges</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Modell (z. B. iPhone 13, ThinkPad X1)</label>
+                        <input type="text" id="repModel" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Fehlerbeschreibung / Gewünschte Reparatur</label>
+                    <textarea id="repDesc" rows="4" required placeholder="z. B. Display gesprungen, Lädt nicht mehr..." class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-white focus:outline-none focus:border-indigo-500 transition"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">Reparatur-Anfrage per E-Mail senden</button>
+            </form>
+        </section>
+
+        <!-- SEITE 3: PRODUKT-DETAILANSICHT -->
+        <section id="page-detail" class="hidden max-w-4xl mx-auto space-y-8 bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl">
+            <button onclick="showPage('shop')" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-2xl text-sm font-bold transition">← Zurück zum Shop</button>
+            <div id="detailContent" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center"></div>
+        </section>
+
+        <!-- SEITE 4: ADMIN PANEL -->
         <section id="page-admin" class="hidden space-y-10">
             <div class="flex justify-between items-center bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-indigo-500/30 shadow-2xl">
                 <div>
                     <h2 class="text-3xl font-black text-indigo-400">🔒 Admin-Konsole & Statistik</h2>
-                    <p class="text-sm text-gray-400">Georg Shop Verwaltung & Abrechnung</p>
+                    <p class="text-sm text-gray-400">Georg Tech & Shop Verwaltung & Abrechnung</p>
                 </div>
                 <button onclick="showPage('shop')" class="bg-gray-800 hover:bg-gray-700 px-4 py-2.5 rounded-2xl text-sm font-bold transition">Verlassen</button>
             </div>
@@ -102,12 +177,29 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl">
-                    <h3 class="text-xl font-bold mb-6">Neues Produkt hinzufügen</h3>
+                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold">Neues Produkt / Teil hinzufügen</h3>
+                        <span id="productSuccessMsg" class="text-xs text-green-400 font-semibold hidden bg-green-950/60 px-3 py-1 rounded-xl border border-green-800">✅ Erfolgreich gespeichert!</span>
+                    </div>
                     <form id="addProductForm" onsubmit="handleCreateProduct(event)" class="space-y-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-1">Produktname</label>
                             <input type="text" id="prodName" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Kategorie</label>
+                            <select id="prodCategory" class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
+                                <option value="Handyhüllen">Handyhüllen</option>
+                                <option value="Laptops">Laptops</option>
+                                <option value="Smart Home">Smart Home</option>
+                                <option value="3D-Druck">3D Gedruckte Teile</option>
+                                <option value="Ersatzteile">Ersatzteile</option>
+                                <option value="Datenkabel">Datenkabel</option>
+                                <option value="Ladegeräte">Ladegeräte</option>
+                                <option value="Speichermedium">Speichermedium</option>
+                                <option value="Drucker & Verbrauchsmaterial">Drucker & Verbrauchsmaterial</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-400 mb-1">Preis (€)</label>
@@ -121,14 +213,19 @@
                     </form>
                 </div>
 
-                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl">
-                    <h3 class="text-xl font-bold mb-6">Bestellungen verwalten</h3>
-                    <div id="adminOrdersList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
+                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
+                    <h3 class="text-xl font-bold">Produkte verwalten</h3>
+                    <div id="adminProductsList" class="space-y-3 max-h-[350px] overflow-y-auto pr-2"></div>
                 </div>
+            </div>
+
+            <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
+                <h3 class="text-xl font-bold">Bestellungen verwalten</h3>
+                <div id="adminOrdersList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
             </div>
         </section>
 
-        <!-- SEITE 3: LOGIN / REGISTRIERUNG -->
+        <!-- SEITE 5: LOGIN / REGISTRIERUNG -->
         <section id="page-auth" class="hidden max-w-md mx-auto bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl">
             <h2 class="text-2xl font-bold mb-6 text-center" id="authTitle">Anmelden</h2>
             <form onsubmit="handleAuth(event)" class="space-y-4">
@@ -140,6 +237,13 @@
                     <label class="block text-sm text-gray-400 mb-1">Passwort</label>
                     <input type="password" id="authPass" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
                 </div>
+                
+                <div id="forgotPasswordContainer" class="text-right">
+                    <button type="button" onclick="handleForgotPassword()" class="text-xs text-indigo-400 hover:underline">
+                        Passwort vergessen?
+                    </button>
+                </div>
+
                 <button type="submit" id="authSubmitBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">Einloggen</button>
             </form>
             <div class="mt-4 text-center">
@@ -149,17 +253,25 @@
             </div>
         </section>
 
-        <!-- SEITE 4: WARENKORB -->
+        <!-- SEITE 6: WARENKORB -->
         <section id="page-cart" class="hidden max-w-3xl mx-auto space-y-8">
             <h2 class="text-2xl font-bold">Warenkorb</h2>
             <div id="cartItems" class="space-y-4"></div>
             
-            <div class="bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-800 shadow-2xl space-y-6">
-                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                    <span class="text-gray-400 font-medium">Gesamtsumme:</span>
+            <div class="bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-800 shadow-2xl space-y-4">
+                <div class="flex justify-between items-center text-sm text-gray-400">
+                    <span>Zwischensumme:</span>
+                    <span id="cartSubtotal">0,00 €</span>
+                </div>
+                <div class="flex justify-between items-center text-sm text-gray-400 border-b border-gray-800 pb-4">
+                    <span>Versandkosten (Standard):</span>
+                    <span id="cartShipping">4,95 €</span>
+                </div>
+                <div class="flex justify-between items-center pb-2">
+                    <span class="text-gray-200 font-bold">Gesamtsumme (inkl. MwSt. & Versand):</span>
                     <span id="cartTotalSum" class="text-2xl font-black text-indigo-400">0,00 €</span>
                 </div>
-                <h3 class="text-xl font-bold">Zahlung abwickeln</h3>
+                <h3 class="text-xl font-bold pt-2">Zahlung abwickeln</h3>
                 <div id="paypal-button-container" class="mt-4"></div>
             </div>
         </section>
@@ -170,11 +282,12 @@
     <section class="border-t border-gray-800/80 bg-gray-900/30 backdrop-blur-md py-12 px-6 mt-auto relative z-10">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div class="space-y-3">
-                <h3 class="text-xl font-bold text-indigo-400">Georg Shop Support</h3>
-                <p class="text-sm text-gray-400">Haben Sie Fragen zu unseren Produkten oder Ihrer Bestellung? Kontaktieren Sie uns gerne direkt.</p>
+                <h3 class="text-xl font-bold text-indigo-400">Georg Tech & Shop Support</h3>
+                <p class="text-sm text-gray-400">Haben Sie Fragen zu Reparaturen, Produkten oder Zubehör? Kontaktieren Sie uns gerne direkt.</p>
                 <div class="text-sm text-gray-300 space-y-1">
                     <p>📞 Telefon: <span class="text-white font-medium">+49 (0) 15510788357</span></p>
                     <p>✉️ E-Mail: <span class="text-white font-medium">georgestoevv28@gmail.com</span></p>
+                    <p>📦 Versandinfo: <span class="text-gray-400">Standardversand 4,95 € (2-4 Werktage)</span></p>
                 </div>
             </div>
 
@@ -193,11 +306,12 @@
 
     <!-- Footer -->
     <footer class="border-t border-gray-800/80 py-6 bg-gray-950 text-center text-xs text-gray-600 relative z-10">
-        &copy; 2026 Georg Shop. Alle Rechte vorbehalten.
+        &copy; 2026 Georg Tech & Shop. Alle Rechte vorbehalten.
     </footer>
 
     <script>
         const ADMIN_PASSWORD = "admin123";
+        const SHIPPING_FEE = 4.95;
 
         const firebaseConfig = {
             apiKey: "AIzaSyBSmTJwHc-zA2AM0PnkIlgqV5sqOGHV4rY",
@@ -214,13 +328,33 @@
         const auth = firebase.auth();
 
         let products = JSON.parse(localStorage.getItem('products')) || [
-            { id: '1', name: 'Cyberpunk Sneaker', price: 189.00, image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&auto=format&fit=crop' },
-            { id: '2', name: 'Wireless Headset', price: 99.00, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop' }
+            { id: '1', name: 'USB-C Schnellladekabel 2m', category: 'Datenkabel', price: 12.90, image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500&auto=format&fit=crop' },
+            { id: '2', name: '128GB High-Speed MicroSD', category: 'Speichermedium', price: 19.99, image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop' }
         ];
 
         let orders = JSON.parse(localStorage.getItem('orders')) || [];
         let cart = [];
         let isRegisterMode = false;
+        let selectedCategory = 'all';
+
+        // Funktion für den schwebenden Design-Ballon (Toast)
+        let toastTimeout = null;
+        function showToast(title, desc) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastDesc').innerText = desc;
+
+            // Einblenden
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            // Nach 3 Sekunden automatisch ausblenden
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
 
         auth.onAuthStateChanged((user) => {
             const container = document.getElementById('authNavContainer');
@@ -233,7 +367,7 @@
 
         function handleLogout() {
             auth.signOut().then(() => {
-                alert('Erfolgreich abgemeldet!');
+                showToast('Abgemeldet', 'Sie wurden erfolgreich abgemeldet.');
                 showPage('shop');
             });
         }
@@ -268,16 +402,183 @@
         }
 
         function showPage(pageId) {
-            ['shop', 'admin', 'auth', 'cart'].forEach(id => {
-                document.getElementById(`page-${id}`).classList.add('hidden');
+            ['shop', 'repair', 'detail', 'admin', 'auth', 'cart'].forEach(id => {
+                const el = document.getElementById(`page-${id}`);
+                if (el) el.classList.add('hidden');
             });
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) target.classList.remove('hidden');
+
             if (pageId === 'cart') renderCart();
             if (pageId === 'admin') {
+                renderAdminProducts();
                 renderAdminOrders();
                 calculateStatistics();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showProductDetail(productId) {
+            const prod = products.find(p => p.id === productId);
+            if (!prod) return;
+
+            const container = document.getElementById('detailContent');
+            container.innerHTML = `
+                <img src="${prod.image}" class="w-full h-80 object-cover rounded-2xl shadow-2xl">
+                <div class="space-y-6">
+                    <span class="bg-indigo-600/20 text-indigo-400 text-xs px-3 py-1 rounded-full font-bold">${prod.category || 'Produkt'}</span>
+                    <h2 class="text-3xl font-black text-white">${prod.name}</h2>
+                    <p class="text-3xl font-black text-indigo-400">${prod.price.toFixed(2)} €</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">Erleben Sie höchste Qualität mit diesem exklusiven Artikel aus dem Georg Tech & Shop. Schnell, sicher und zuverlässig geliefert.</p>
+                    <div class="flex space-x-4">
+                        <button onclick="addToCart('${prod.id}')" class="flex-grow bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">In den Warenkorb</button>
+                    </div>
+                </div>
+            `;
+            showPage('detail');
+        }
+
+        function handleRepairRequest(e) {
+            e.preventDefault();
+            const name = document.getElementById('repName').value;
+            const contact = document.getElementById('repContact').value;
+            const type = document.getElementById('repType').value;
+            const model = document.getElementById('repModel').value;
+            const desc = document.getElementById('repDesc').value;
+
+            const targetEmail = "georgestoevv28@gmail.com";
+            const subject = `Reparatur-Anfrage: ${type} (${model})`;
+            const body = `Name: ${name}\nKontakt: ${contact}\nGerät: ${type}\nModell: ${model}\n\nFehlerbeschreibung:\n${desc}`;
+
+            window.location.href = `mailto:${targetEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        function setCategoryFilter(category) {
+            selectedCategory = category;
+            
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-white', 'scale-105');
+            });
+            event.currentTarget.classList.add('ring-2', 'ring-white', 'scale-105');
+
+            filterProducts();
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = products.filter(p => {
+                const matchesQuery = p.name.toLowerCase().includes(query);
+                const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+                return matchesQuery && matchesCategory;
+            });
+            renderProductsList(filtered);
+        }
+
+        function loadProductsFromFirebase() {
+            db.collection('products').get().then(snapshot => {
+                if (!snapshot.empty) {
+                    products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderProducts();
+                }
+            });
+        }
+
+        function renderProducts() {
+            filterProducts();
+        }
+
+        function renderProductsList(listToRender) {
+            const grid = document.getElementById('productGrid');
+            if (listToRender.length === 0) {
+                grid.innerHTML = `<p class="text-gray-400 col-span-full text-center py-8">Keine Artikel in dieser Kategorie gefunden.</p>`;
+                return;
+            }
+            grid.innerHTML = listToRender.map(p => `
+                <div class="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-3xl p-5 flex flex-col justify-between shadow-xl hover:border-indigo-500/50 transition">
+                    <div onclick="showProductDetail('${p.id}')" class="cursor-pointer space-y-3">
+                        <img src="${p.image}" class="h-56 w-full object-cover rounded-2xl shadow-md hover:opacity-90 transition">
+                        <div>
+                            <span class="text-xs bg-indigo-950 text-indigo-300 px-2.5 py-1 rounded-full font-semibold">${p.category || 'Allgemein'}</span>
+                            <h3 class="font-bold text-lg text-white hover:text-indigo-400 transition mt-2 leading-snug">${p.name}</h3>
+                            <p class="text-indigo-400 font-black mt-2 text-xl">${p.price.toFixed(2)} €</p>
+                        </div>
+                    </div>
+                    <div class="mt-5 flex gap-2">
+                        <button onclick="showProductDetail('${p.id}')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2.5 rounded-2xl text-sm font-bold transition">Details</button>
+                        <button onclick="addToCart('${p.id}')" class="flex-grow bg-indigo-600 hover:bg-indigo-500 py-2.5 rounded-2xl font-semibold shadow-lg shadow-indigo-600/20 transition">In den Warenkorb</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleCreateProduct(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('prodImgFile');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    const newProd = {
+                        name: document.getElementById('prodName').value,
+                        category: document.getElementById('prodCategory').value,
+                        price: parseFloat(document.getElementById('prodPrice').value),
+                        image: uploadEvent.target.result
+                    };
+                    
+                    db.collection('products').add(newProd).then(docRef => {
+                        newProd.id = docRef.id;
+                        products.push(newProd);
+                        localStorage.setItem('products', JSON.stringify(products));
+                        renderProducts();
+                        renderAdminProducts();
+                        document.getElementById('addProductForm').reset();
+                        
+                        const msg = document.getElementById('productSuccessMsg');
+                        msg.classList.remove('hidden');
+                        setTimeout(() => {
+                            msg.classList.add('hidden');
+                        }, 4000);
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderAdminProducts() {
+            const container = document.getElementById('adminProductsList');
+            if (products.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm">Keine Produkte vorhanden.</p>`;
+                return;
+            }
+            container.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between bg-gray-800/80 p-3 rounded-2xl border border-gray-700">
+                    <div class="flex items-center space-x-3">
+                        <img src="${p.image}" class="w-10 h-10 object-cover rounded-xl">
+                        <div>
+                            <h4 class="font-bold text-sm text-white">${p.name}</h4>
+                            <span class="text-indigo-400 text-xs">${p.price.toFixed(2)} € (${p.category || 'Allgemein'})</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteProduct('${p.id}')" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                        Löschen
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function deleteProduct(productId) {
+            if (confirm("Möchten Sie diesen Artikel wirklich löschen?")) {
+                db.collection('products').doc(productId).delete().then(() => {
+                    products = products.filter(p => p.id !== productId);
+                    localStorage.setItem('products', JSON.stringify(products));
+                    renderProducts();
+                    renderAdminProducts();
+                    showToast("Gelöscht", "Der Artikel wurde entfernt.");
+                }).catch(error => {
+                    alert("Fehler beim Löschen: " + error.message);
+                });
+            }
         }
 
         function calculateStatistics() {
@@ -294,7 +595,8 @@
                 if (orderMonth === currentMonthYear) monthRevenue += o.total;
                 if (o.items) {
                     o.items.forEach(item => {
-                        productCounts[item] = (productCounts[item] || 0) + 1;
+                        let cleanName = item.split(' (')[0];
+                        productCounts[cleanName] = (productCounts[cleanName] || 0) + 1;
                     });
                 }
             });
@@ -333,7 +635,7 @@
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(20);
-            doc.text("GEORG SHOP - FINANZABRECHNUNG", 14, 20);
+            doc.text("GEORG TECH & SHOP - FINANZABRECHNUNG", 14, 20);
 
             doc.setFontSize(14);
             doc.setTextColor(100);
@@ -386,7 +688,7 @@
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(22);
-            doc.text("GEORG SHOP", 14, 20);
+            doc.text("GEORG TECH & SHOP", 14, 20);
 
             doc.setFontSize(12);
             doc.setTextColor(100);
@@ -411,81 +713,18 @@
                 yPos += 8;
             });
 
+            yPos += 4;
+            doc.text("Standardversand", 14, yPos);
+            doc.text(SHIPPING_FEE.toFixed(2) + " €", 160, yPos);
+
             yPos += 10;
             doc.line(14, yPos, 196, yPos);
             yPos += 10;
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.text(`Gesamtsumme: ${order.total.toFixed(2)} €`, 14, yPos);
+            doc.text(`Gesamtsumme (inkl. Versand): ${order.total.toFixed(2)} €`, 14, yPos);
 
             doc.save(`Rechnung_${order.id}.pdf`);
-        }
-
-        function filterProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
-            renderProductsList(filtered);
-        }
-
-        function loadProductsFromFirebase() {
-            db.collection('products').get().then(snapshot => {
-                if (!snapshot.empty) {
-                    products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderProductsList(products);
-                }
-            });
-        }
-
-        function renderProducts() {
-            renderProductsList(products);
-        }
-
-        function renderProductsList(listToRender) {
-            const grid = document.getElementById('productGrid');
-            if (listToRender.length === 0) {
-                grid.innerHTML = `<p class="text-gray-400 col-span-3 text-center py-8">Keine Produkte gefunden.</p>`;
-                return;
-            }
-            grid.innerHTML = listToRender.map(p => `
-                <div class="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-3xl p-5 flex flex-col justify-between shadow-xl hover:border-indigo-500/50 transition">
-                    <img src="${p.image}" class="h-48 w-full object-cover rounded-2xl mb-4 shadow-md">
-                    <div>
-                        <h3 class="font-bold text-lg text-white">${p.name}</h3>
-                        <p class="text-indigo-400 font-black mt-1 text-lg">${p.price.toFixed(2)} €</p>
-                    </div>
-                    <div class="mt-5">
-                        <button onclick="addToCart('${p.id}')" class="w-full bg-indigo-600 hover:bg-indigo-500 py-2.5 rounded-2xl font-semibold shadow-lg shadow-indigo-600/20 transition">In den Warenkorb</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function handleCreateProduct(e) {
-            e.preventDefault();
-            const fileInput = document.getElementById('prodImgFile');
-            const file = fileInput.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(uploadEvent) {
-                    const newProd = {
-                        name: document.getElementById('prodName').value,
-                        price: parseFloat(document.getElementById('prodPrice').value),
-                        image: uploadEvent.target.result
-                    };
-                    
-                    db.collection('products').add(newProd).then(docRef => {
-                        newProd.id = docRef.id;
-                        products.push(newProd);
-                        localStorage.setItem('products', JSON.stringify(products));
-                        renderProducts();
-                        document.getElementById('addProductForm').reset();
-                        alert('Produkt erfolgreich in Firebase gespeichert!');
-                        showPage('shop');
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
         }
 
         function renderAdminOrders() {
@@ -544,7 +783,7 @@
             const subject = document.getElementById('simpleSubject').value;
             const msg = document.getElementById('simpleMsg').value;
 
-            const targetEmail = "kontakt@georg-shop.de";
+            const targetEmail = "georgestoevv28@gmail.com";
             const mailtoLink = `mailto:${targetEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("Name: " + name + "\nE-Mail: " + email + "\n\nNachricht:\n" + msg)}`;
             
             window.location.href = mailtoLink;
@@ -553,24 +792,45 @@
         function addToCart(id) {
             const prod = products.find(p => p.id === id);
             if (prod) {
-                cart.push({ ...prod, cartItemId: Date.now() + Math.random() });
-                document.getElementById('cartBadge').innerText = cart.length;
-                alert(`"${prod.name}" wurde zum Warenkorb hinzugefügt!`);
+                const existingItem = cart.find(item => item.id === id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({ ...prod, quantity: 1 });
+                }
+                updateCartBadge();
+                // Schöner Ballon statt alert()
+                showToast(prod.name, 'Erfolgreich zum Warenkorb hinzugefügt!');
             }
         }
 
-        function removeFromCart(cartItemId) {
-            cart = cart.filter(item => item.cartItemId !== cartItemId);
-            document.getElementById('cartBadge').innerText = cart.length;
-            renderCart();
+        function changeQuantity(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+                updateCartBadge();
+                renderCart();
+            }
+        }
+
+        function updateCartBadge() {
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartBadge').innerText = totalCount;
         }
 
         function renderCart() {
             const container = document.getElementById('cartItems');
+            const subtotalElement = document.getElementById('cartSubtotal');
+            const shippingElement = document.getElementById('cartShipping');
             const totalSumElement = document.getElementById('cartTotalSum');
             
             if (cart.length === 0) {
                 container.innerHTML = `<p class="text-gray-400">Der Warenkorb ist noch leer.</p>`;
+                subtotalElement.innerText = '0,00 €';
+                shippingElement.innerText = '0,00 €';
                 totalSumElement.innerText = '0,00 €';
                 document.getElementById('paypal-button-container').innerHTML = '';
                 return;
@@ -582,16 +842,24 @@
                         <img src="${item.image}" class="w-12 h-12 object-cover rounded-xl shadow">
                         <div>
                             <h4 class="font-bold text-sm text-white">${item.name}</h4>
-                            <span class="text-indigo-400 text-sm font-semibold">${item.price.toFixed(2)} €</span>
+                            <span class="text-indigo-400 text-sm font-semibold">${(item.price * item.quantity).toFixed(2)} €</span>
                         </div>
                     </div>
-                    <button onclick="removeFromCart(${item.cartItemId})" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">
-                        🗑️ Entfernen
-                    </button>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+                            <button onclick="changeQuantity('${item.id}', -1)" class="px-3 py-1 text-gray-300 hover:bg-gray-700 font-bold transition">-</button>
+                            <span class="px-3 py-1 text-sm font-semibold text-white">${item.quantity}</span>
+                            <button onclick="changeQuantity('${item.id}', 1)" class="px-3 py-1 text-gray-300 hover:bg-gray-700 font-bold transition">+</button>
+                        </div>
+                    </div>
                 </div>
             `).join('');
 
-            const totalSum = cart.reduce((sum, item) => sum + item.price, 0);
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalSum = subtotal + SHIPPING_FEE;
+
+            subtotalElement.innerText = subtotal.toFixed(2) + ' €';
+            shippingElement.innerText = SHIPPING_FEE.toFixed(2) + ' €';
             totalSumElement.innerText = totalSum.toFixed(2) + ' €';
 
             renderPayPalButton(totalSum);
@@ -613,14 +881,15 @@
                 },
                 onApprove: function(data, actions) {
                     return actions.order.capture().then(function(details) {
-                        alert('Zahlung erfolgreich! Vielen Dank für Ihren Einkauf, ' + details.payer.name.given_name + '!');
+                        showToast('Zahlung erfolgreich!', 'Vielen Dank für Ihren Einkauf, ' + details.payer.name.given_name + '!');
                         
+                        const itemNames = cart.map(item => `${item.name} (${item.quantity}x)`);
                         const newOrder = {
                             id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
                             date: new Date().toLocaleDateString('de-DE'),
                             rawDate: new Date().toISOString(),
                             total: totalAmount,
-                            items: cart.map(item => item.name),
+                            items: itemNames,
                             payment: 'PayPal',
                             status: 'Neu'
                         };
@@ -631,7 +900,7 @@
                         generateCustomerInvoicePDF(newOrder);
 
                         cart = [];
-                        document.getElementById('cartBadge').innerText = '0';
+                        updateCartBadge();
                         showPage('shop');
                     });
                 }
@@ -643,6 +912,27 @@
             document.getElementById('authTitle').innerText = isRegisterMode ? 'Registrieren' : 'Anmelden';
             document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Konto erstellen' : 'Einloggen';
             document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'Bereits ein Konto? Anmelden' : 'Noch kein Konto? Jetzt registrieren';
+            
+            const forgotContainer = document.getElementById('forgotPasswordContainer');
+            if (forgotContainer) {
+                forgotContainer.style.display = isRegisterMode ? 'none' : 'block';
+            }
+        }
+
+        function handleForgotPassword() {
+            const email = document.getElementById('authEmail').value;
+            if (!email) {
+                alert('Bitte tragen Sie zuerst Ihre E-Mail-Adresse im Feld ein.');
+                return;
+            }
+
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    showToast('E-Mail gesendet', 'Link zum Zurücksetzen wurde verschickt.');
+                })
+                .catch((error) => {
+                    alert('Fehler beim Senden der E-Mail: ' + error.message);
+                });
         }
 
         function handleAuth(e) {
@@ -652,11 +942,11 @@
 
             if (isRegisterMode) {
                 auth.createUserWithEmailAndPassword(email, pass)
-                    .then(() => { alert('Konto erfolgreich erstellt!'); showPage('shop'); })
+                    .then(() => { showToast('Erfolg', 'Konto erfolgreich erstellt!'); showPage('shop'); })
                     .catch(err => alert("Fehler: " + err.message));
             } else {
                 auth.signInWithEmailAndPassword(email, pass)
-                    .then(() => { alert('Erfolgreich angemeldet!'); showPage('shop'); })
+                    .then(() => { showToast('Erfolg', 'Erfolgreich angemeldet!'); showPage('shop'); })
                     .catch(err => alert("Fehler: " + err.message));
             }
         }
