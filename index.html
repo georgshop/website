@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Georg Shop</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcFbOAwcpR1--nzQLF7KYeS2gWzEwUAL3RlYIniv8qifry_SWNr-9pw2CtPaPqmaGBE6KaxjcCPxkrtl&currency=EUR"></script>
+    <!-- jsPDF Bibliothek -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+
+    <!-- Moderner Ambient-Hintergrund (Leuchtende Lichtkugeln) -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Navigation -->
+    <header class="border-b border-gray-800/80 bg-gray-900/60 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <button onclick="handleLogoClick()" class="text-2xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent text-left">
+                GEORG<span class="text-white"> SHOP</span>
+            </button>
+
+            <nav class="flex items-center space-x-6 text-sm font-semibold">
+                <button onclick="showPage('shop')" class="hover:text-indigo-400 transition">Shop</button>
+                
+                <div id="authNavContainer">
+                    <button onclick="showPage('auth')" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-2xl shadow-lg shadow-indigo-600/20 transition">
+                        Login / Registrieren
+                    </button>
+                </div>
+
+                <button onclick="showPage('cart')" class="relative p-2.5 bg-gray-900/80 rounded-2xl border border-gray-800 hover:border-indigo-500/50 transition">
+                    🛒 <span id="cartBadge" class="ml-1 bg-indigo-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 flex-grow w-full space-y-16 relative z-10">
+
+        <!-- SEITE 1: SHOP -->
+        <section id="page-shop" class="space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-4">
+                <h1 class="text-5xl font-black mb-2 tracking-tight">Willkommen bei <span class="bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent">Georg Shop</span></h1>
+                <p class="text-gray-400 text-lg">Entdecken Sie unsere exklusiven Produkte und Top-Angebote.</p>
+                
+                <!-- Such- und Filterfeld -->
+                <div class="relative max-w-md mx-auto pt-2">
+                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="🔍 Produkte durchsuchen..." class="w-full bg-gray-900/80 backdrop-blur-md border border-gray-800 rounded-2xl py-3.5 px-5 text-sm text-white focus:outline-none focus:border-indigo-500 shadow-xl transition">
+                </div>
+            </div>
+            
+            <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </section>
+
+        <!-- SEITE 2: ADMIN PANEL -->
+        <section id="page-admin" class="hidden space-y-10">
+            <div class="flex justify-between items-center bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-indigo-500/30 shadow-2xl">
+                <div>
+                    <h2 class="text-3xl font-black text-indigo-400">🔒 Admin-Konsole & Statistik</h2>
+                    <p class="text-sm text-gray-400">Georg Shop Verwaltung & Abrechnung</p>
+                </div>
+                <button onclick="showPage('shop')" class="bg-gray-800 hover:bg-gray-700 px-4 py-2.5 rounded-2xl text-sm font-bold transition">Verlassen</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-800 flex flex-col justify-between space-y-4 shadow-xl">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Tagesumsatz (Heute)</p>
+                        <p id="statDayRevenue" class="text-3xl font-black text-indigo-400 mt-2">0,00 €</p>
+                    </div>
+                    <button onclick="exportPDF('day')" class="w-full bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white py-2.5 rounded-2xl text-xs font-bold transition">
+                        📄 Tagesabwicklung als PDF
+                    </button>
+                </div>
+
+                <div class="bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-800 flex flex-col justify-between space-y-4 shadow-xl">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Monatsumsatz (Aktueller Monat)</p>
+                        <p id="statMonthRevenue" class="text-3xl font-black text-green-400 mt-2">0,00 €</p>
+                    </div>
+                    <button onclick="exportPDF('month')" class="w-full bg-green-600/20 text-green-400 hover:bg-green-600 hover:text-white py-2.5 rounded-2xl text-xs font-bold transition">
+                        📄 Monatsabwicklung als PDF
+                    </button>
+                </div>
+
+                <div class="bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-800 flex flex-col justify-between space-y-4 shadow-xl">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Beliebtestes Produkt</p>
+                        <p id="statTopProduct" class="text-xl font-bold text-pink-400 mt-3 truncate">-</p>
+                    </div>
+                    <div class="text-xs text-gray-500 italic">Automatische Analyse</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl">
+                    <h3 class="text-xl font-bold mb-6">Neues Produkt hinzufügen</h3>
+                    <form id="addProductForm" onsubmit="handleCreateProduct(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Produktname</label>
+                            <input type="text" id="prodName" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Preis (€)</label>
+                            <input type="number" step="0.01" id="prodPrice" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Produktbild von Festplatte hochladen</label>
+                            <input type="file" id="prodImgFile" accept="image/*" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-2.5 text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">Produkt speichern</button>
+                    </form>
+                </div>
+
+                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl">
+                    <h3 class="text-xl font-bold mb-6">Bestellungen verwalten</h3>
+                    <div id="adminOrdersList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEITE 3: LOGIN / REGISTRIERUNG -->
+        <section id="page-auth" class="hidden max-w-md mx-auto bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6 text-center" id="authTitle">Anmelden</h2>
+            <form onsubmit="handleAuth(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">E-Mail</label>
+                    <input type="email" id="authEmail" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Passwort</label>
+                    <input type="password" id="authPass" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
+                </div>
+                <button type="submit" id="authSubmitBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">Einloggen</button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-sm text-indigo-400 hover:underline">
+                    Noch kein Konto? Jetzt registrieren
+                </button>
+            </div>
+        </section>
+
+        <!-- SEITE 4: WARENKORB -->
+        <section id="page-cart" class="hidden max-w-3xl mx-auto space-y-8">
+            <h2 class="text-2xl font-bold">Warenkorb</h2>
+            <div id="cartItems" class="space-y-4"></div>
+            
+            <div class="bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-800 shadow-2xl space-y-6">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                    <span class="text-gray-400 font-medium">Gesamtsumme:</span>
+                    <span id="cartTotalSum" class="text-2xl font-black text-indigo-400">0,00 €</span>
+                </div>
+                <h3 class="text-xl font-bold">Zahlung abwickeln</h3>
+                <div id="paypal-button-container" class="mt-4"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- KONTAKT-BEREICH -->
+    <section class="border-t border-gray-800/80 bg-gray-900/30 backdrop-blur-md py-12 px-6 mt-auto relative z-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="space-y-3">
+                <h3 class="text-xl font-bold text-indigo-400">Georg Shop Support</h3>
+                <p class="text-sm text-gray-400">Haben Sie Fragen zu unseren Produkten oder Ihrer Bestellung? Kontaktieren Sie uns gerne direkt.</p>
+                <div class="text-sm text-gray-300 space-y-1">
+                    <p>📞 Telefon: <span class="text-white font-medium">+49 (0) 123 456789</span></p>
+                    <p>✉️ E-Mail: <span class="text-white font-medium">kontakt@georg-shop.de</span></p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-gray-800 shadow-xl">
+                <h4 class="font-bold mb-4">Nachricht senden</h4>
+                <form onsubmit="handleSimpleContact(event)" class="space-y-3">
+                    <input type="text" id="simpleName" placeholder="Ihr Name" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                    <input type="email" id="simpleEmail" placeholder="Ihre E-Mail-Adresse" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                    <input type="text" id="simpleSubject" placeholder="Betreff" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                    <textarea id="simpleMsg" placeholder="Ihre Nachricht..." rows="3" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition"></textarea>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition">E-Mail App öffnen & Absenden</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800/80 py-6 bg-gray-950 text-center text-xs text-gray-600 relative z-10">
+        &copy; 2026 Georg Shop. Alle Rechte vorbehalten.
+    </footer>
+
+    <script>
+        const ADMIN_PASSWORD = "admin123";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSmTJwHc-zA2AM0PnkIlgqV5sqOGHV4rY",
+            authDomain: "techshop-2fc91.firebaseapp.com",
+            projectId: "techshop-2fc91",
+            storageBucket: "techshop-2fc91.firebasestorage.app",
+            messagingSenderId: "963021978163",
+            appId: "1:963021978163:web:98e959d3573fc7232bc146",
+            measurementId: "G-3RE27SHTJY"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let products = JSON.parse(localStorage.getItem('products')) || [
+            { id: '1', name: 'Cyberpunk Sneaker', price: 189.00, image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&auto=format&fit=crop' },
+            { id: '2', name: 'Wireless Headset', price: 99.00, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop' }
+        ];
+
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let cart = [];
+        let isRegisterMode = false;
+
+        auth.onAuthStateChanged((user) => {
+            const container = document.getElementById('authNavContainer');
+            if (user) {
+                container.innerHTML = `<button onclick="handleLogout()" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-4 py-2 rounded-2xl transition font-semibold">Abmelden</button>`;
+            } else {
+                container.innerHTML = `<button onclick="showPage('auth')" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-2xl shadow-lg shadow-indigo-600/20 transition">Login / Registrieren</button>`;
+            }
+        });
+
+        function handleLogout() {
+            auth.signOut().then(() => {
+                alert('Erfolgreich abgemeldet!');
+                showPage('shop');
+            });
+        }
+
+        function checkAdminAccess() {
+            const enteredPass = prompt("Bitte geben Sie das Admin-Passwort ein:");
+            if (enteredPass === ADMIN_PASSWORD) {
+                showPage('admin');
+            } else if (enteredPass !== null) {
+                alert("Falsches Passwort!");
+            }
+        }
+
+        let keyBuffer = '';
+        document.addEventListener('keydown', (e) => {
+            keyBuffer += e.key.toLowerCase();
+            if (keyBuffer.length > 5) keyBuffer = keyBuffer.slice(-5);
+            if (keyBuffer === 'admin') checkAdminAccess();
+        });
+
+        let logoClicks = 0;
+        let logoTimer = null;
+        function handleLogoClick() {
+            logoClicks++;
+            clearTimeout(logoTimer);
+            if (logoClicks >= 5) {
+                checkAdminAccess();
+                logoClicks = 0;
+            } else {
+                logoTimer = setTimeout(() => { logoClicks = 0; showPage('shop'); }, 1000);
+            }
+        }
+
+        function showPage(pageId) {
+            ['shop', 'admin', 'auth', 'cart'].forEach(id => {
+                document.getElementById(`page-${id}`).classList.add('hidden');
+            });
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            if (pageId === 'cart') renderCart();
+            if (pageId === 'admin') {
+                renderAdminOrders();
+                calculateStatistics();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function calculateStatistics() {
+            const todayStr = new Date().toLocaleDateString('de-DE');
+            const currentMonthYear = new Date().toISOString().slice(0, 7);
+
+            let dayRevenue = 0;
+            let monthRevenue = 0;
+            let productCounts = {};
+
+            orders.forEach(o => {
+                if (o.date === todayStr) dayRevenue += o.total;
+                let orderMonth = o.rawDate ? o.rawDate.slice(0, 7) : currentMonthYear;
+                if (orderMonth === currentMonthYear) monthRevenue += o.total;
+                if (o.items) {
+                    o.items.forEach(item => {
+                        productCounts[item] = (productCounts[item] || 0) + 1;
+                    });
+                }
+            });
+
+            document.getElementById('statDayRevenue').innerText = dayRevenue.toFixed(2) + ' €';
+            document.getElementById('statMonthRevenue').innerText = monthRevenue.toFixed(2) + ' €';
+
+            let topProduct = '-';
+            let maxCount = 0;
+            for (let [prod, count] of Object.entries(productCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    topProduct = `${prod} (${count}x)`;
+                }
+            }
+            document.getElementById('statTopProduct').innerText = topProduct;
+        }
+
+        function exportPDF(type) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const todayStr = new Date().toLocaleDateString('de-DE');
+            const currentMonthYear = new Date().toISOString().slice(0, 7);
+
+            let title = type === 'day' ? `Tagesabrechnung (${todayStr})` : `Monatsabrechnung (${currentMonthYear})`;
+            let totalSum = 0;
+            let filteredOrders = orders.filter(o => {
+                if (type === 'day') {
+                    return o.date === todayStr;
+                } else {
+                    let orderMonth = o.rawDate ? o.rawDate.slice(0, 7) : currentMonthYear;
+                    return orderMonth === currentMonthYear;
+                }
+            });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.text("GEORG SHOP - FINANZABRECHNUNG", 14, 20);
+
+            doc.setFontSize(14);
+            doc.setTextColor(100);
+            doc.text(title, 14, 30);
+
+            doc.setFontSize(10);
+            doc.text(`Erstellt am: ${new Date().toLocaleString('de-DE')}`, 14, 38);
+            doc.line(14, 42, 196, 42);
+
+            let yPos = 52;
+            doc.setFont("helvetica", "bold");
+            doc.text("Bestell-ID", 14, yPos);
+            doc.text("Datum", 55, yPos);
+            doc.text("Zahlung", 90, yPos);
+            doc.text("Betrag", 140, yPos);
+
+            doc.setFont("helvetica", "normal");
+            yPos += 8;
+
+            if (filteredOrders.length === 0) {
+                doc.text("Keine Bestellungen im gewählten Zeitraum vorhanden.", 14, yPos);
+            } else {
+                filteredOrders.forEach(o => {
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    doc.text(o.id, 14, yPos);
+                    doc.text(o.date, 55, yPos);
+                    doc.text(o.payment, 90, yPos);
+                    doc.text(o.total.toFixed(2) + " €", 140, yPos);
+                    totalSum += o.total;
+                    yPos += 8;
+                });
+            }
+
+            yPos += 10;
+            doc.line(14, yPos, 196, yPos);
+            yPos += 10;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text(`Gesamtumsatz: ${totalSum.toFixed(2)} €`, 14, yPos);
+
+            doc.save(`GeorgShop_${type}_abrechnung.pdf`);
+        }
+
+        function generateCustomerInvoicePDF(order) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("GEORG SHOP", 14, 20);
+
+            doc.setFontSize(12);
+            doc.setTextColor(100);
+            doc.text("Bestellbestätigung / Rechnung", 14, 28);
+
+            doc.setFontSize(10);
+            doc.text(`Bestellnummer: ${order.id}`, 14, 40);
+            doc.text(`Datum: ${order.date}`, 14, 46);
+            doc.text(`Zahlungsart: ${order.payment} (Bezahlt)`, 14, 52);
+            doc.line(14, 58, 196, 58);
+
+            let yPos = 68;
+            doc.setFont("helvetica", "bold");
+            doc.text("Artikel", 14, yPos);
+            doc.text("Betrag", 160, yPos);
+
+            doc.setFont("helvetica", "normal");
+            yPos += 8;
+
+            order.items.forEach(itemName => {
+                doc.text(itemName, 14, yPos);
+                yPos += 8;
+            });
+
+            yPos += 10;
+            doc.line(14, yPos, 196, yPos);
+            yPos += 10;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text(`Gesamtsumme: ${order.total.toFixed(2)} €`, 14, yPos);
+
+            doc.save(`Rechnung_${order.id}.pdf`);
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+            renderProductsList(filtered);
+        }
+
+        function loadProductsFromFirebase() {
+            db.collection('products').get().then(snapshot => {
+                if (!snapshot.empty) {
+                    products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderProductsList(products);
+                }
+            });
+        }
+
+        function renderProducts() {
+            renderProductsList(products);
+        }
+
+        function renderProductsList(listToRender) {
+            const grid = document.getElementById('productGrid');
+            if (listToRender.length === 0) {
+                grid.innerHTML = `<p class="text-gray-400 col-span-3 text-center py-8">Keine Produkte gefunden.</p>`;
+                return;
+            }
+            grid.innerHTML = listToRender.map(p => `
+                <div class="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-3xl p-5 flex flex-col justify-between shadow-xl hover:border-indigo-500/50 transition">
+                    <img src="${p.image}" class="h-48 w-full object-cover rounded-2xl mb-4 shadow-md">
+                    <div>
+                        <h3 class="font-bold text-lg text-white">${p.name}</h3>
+                        <p class="text-indigo-400 font-black mt-1 text-lg">${p.price.toFixed(2)} €</p>
+                    </div>
+                    <div class="mt-5">
+                        <button onclick="addToCart('${p.id}')" class="w-full bg-indigo-600 hover:bg-indigo-500 py-2.5 rounded-2xl font-semibold shadow-lg shadow-indigo-600/20 transition">In den Warenkorb</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleCreateProduct(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('prodImgFile');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    const newProd = {
+                        name: document.getElementById('prodName').value,
+                        price: parseFloat(document.getElementById('prodPrice').value),
+                        image: uploadEvent.target.result
+                    };
+                    
+                    db.collection('products').add(newProd).then(docRef => {
+                        newProd.id = docRef.id;
+                        products.push(newProd);
+                        localStorage.setItem('products', JSON.stringify(products));
+                        renderProducts();
+                        document.getElementById('addProductForm').reset();
+                        alert('Produkt erfolgreich in Firebase gespeichert!');
+                        showPage('shop');
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderAdminOrders() {
+            const container = document.getElementById('adminOrdersList');
+            if (orders.length === 0) {
+                container.innerHTML = `<p class="text-gray-400">Keine Bestellungen vorhanden.</p>`;
+                return;
+            }
+            container.innerHTML = orders.map(o => `
+                <div class="bg-gray-800/80 backdrop-blur-md p-4 rounded-2xl border border-gray-700 space-y-2">
+                    <div class="flex justify-between font-bold text-sm">
+                        <span>Bestellung: ${o.id}</span>
+                        <span class="text-indigo-400">${o.total.toFixed(2)} € (${o.payment})</span>
+                    </div>
+                    <p class="text-xs text-gray-400">Artikel: ${o.items.join(', ')}</p>
+                    <div class="flex items-center justify-between pt-2 gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs bg-indigo-950 text-indigo-300 px-2 py-1 rounded-xl">Status: ${o.status}</span>
+                            <select onchange="updateOrderStatus('${o.id}', this.value)" class="bg-gray-900 border border-gray-700 text-xs rounded-xl p-1 text-white">
+                                <option value="Neu" ${o.status === 'Neu' ? 'selected' : ''}>Neu</option>
+                                <option value="In Bearbeitung" ${o.status === 'In Bearbeitung' ? 'selected' : ''}>In Bearbeitung</option>
+                                <option value="Versendet" ${o.status === 'Versendet' ? 'selected' : ''}>Versendet</option>
+                                <option value="Storniert" ${o.status === 'Storniert' ? 'selected' : ''}>Storniert</option>
+                            </select>
+                        </div>
+                        <button onclick="deleteOrder('${o.id}')" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-3 py-1 rounded-xl text-xs font-bold transition">
+                            Löschen
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                localStorage.setItem('orders', JSON.stringify(orders));
+                renderAdminOrders();
+            }
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm(`Möchten Sie die Bestellung ${orderId} wirklich löschen?`)) {
+                orders = orders.filter(o => o.id !== orderId);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                renderAdminOrders();
+                calculateStatistics();
+            }
+        }
+
+        function handleSimpleContact(e) {
+            e.preventDefault();
+            const name = document.getElementById('simpleName').value;
+            const email = document.getElementById('simpleEmail').value;
+            const subject = document.getElementById('simpleSubject').value;
+            const msg = document.getElementById('simpleMsg').value;
+
+            const targetEmail = "kontakt@georg-shop.de";
+            const mailtoLink = `mailto:${targetEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("Name: " + name + "\nE-Mail: " + email + "\n\nNachricht:\n" + msg)}`;
+            
+            window.location.href = mailtoLink;
+        }
+
+        function addToCart(id) {
+            const prod = products.find(p => p.id === id);
+            if (prod) {
+                cart.push({ ...prod, cartItemId: Date.now() + Math.random() });
+                document.getElementById('cartBadge').innerText = cart.length;
+                alert(`"${prod.name}" wurde zum Warenkorb hinzugefügt!`);
+            }
+        }
+
+        function removeFromCart(cartItemId) {
+            cart = cart.filter(item => item.cartItemId !== cartItemId);
+            document.getElementById('cartBadge').innerText = cart.length;
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            const totalSumElement = document.getElementById('cartTotalSum');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-400">Der Warenkorb ist noch leer.</p>`;
+                totalSumElement.innerText = '0,00 €';
+                document.getElementById('paypal-button-container').innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="flex justify-between items-center bg-gray-900/60 backdrop-blur-xl p-4 rounded-2xl border border-gray-800 shadow-xl">
+                    <div class="flex items-center space-x-4">
+                        <img src="${item.image}" class="w-12 h-12 object-cover rounded-xl shadow">
+                        <div>
+                            <h4 class="font-bold text-sm text-white">${item.name}</h4>
+                            <span class="text-indigo-400 text-sm font-semibold">${item.price.toFixed(2)} €</span>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.cartItemId})" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                        🗑️ Entfernen
+                    </button>
+                </div>
+            `).join('');
+
+            const totalSum = cart.reduce((sum, item) => sum + item.price, 0);
+            totalSumElement.innerText = totalSum.toFixed(2) + ' €';
+
+            renderPayPalButton(totalSum);
+        }
+
+        function renderPayPalButton(totalAmount) {
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '';
+
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: totalAmount.toFixed(2)
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        alert('Zahlung erfolgreich! Vielen Dank für Ihren Einkauf, ' + details.payer.name.given_name + '!');
+                        
+                        const newOrder = {
+                            id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+                            date: new Date().toLocaleDateString('de-DE'),
+                            rawDate: new Date().toISOString(),
+                            total: totalAmount,
+                            items: cart.map(item => item.name),
+                            payment: 'PayPal',
+                            status: 'Neu'
+                        };
+
+                        orders.unshift(newOrder);
+                        localStorage.setItem('orders', JSON.stringify(orders));
+
+                        generateCustomerInvoicePDF(newOrder);
+
+                        cart = [];
+                        document.getElementById('cartBadge').innerText = '0';
+                        showPage('shop');
+                    });
+                }
+            }).render('#paypal-button-container');
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('authTitle').innerText = isRegisterMode ? 'Registrieren' : 'Anmelden';
+            document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Konto erstellen' : 'Einloggen';
+            document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'Bereits ein Konto? Anmelden' : 'Noch kein Konto? Jetzt registrieren';
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const pass = document.getElementById('authPass').value;
+
+            if (isRegisterMode) {
+                auth.createUserWithEmailAndPassword(email, pass)
+                    .then(() => { alert('Konto erfolgreich erstellt!'); showPage('shop'); })
+                    .catch(err => alert("Fehler: " + err.message));
+            } else {
+                auth.signInWithEmailAndPassword(email, pass)
+                    .then(() => { alert('Erfolgreich angemeldet!'); showPage('shop'); })
+                    .catch(err => alert("Fehler: " + err.message));
+            }
+        }
+
+        loadProductsFromFirebase();
+        renderProducts();
+    </script>
+</body>
+</html>
