@@ -31,13 +31,14 @@
     </div>
 
     <!-- Navigation -->
-    <header class="border-b border-gray-800/80 bg-gray-900/60 backdrop-blur-xl sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <button onclick="handleLogoClick()" class="text-2xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent text-left">
+    <header class="border-b border-gray-800/80 bg-gray-900/80 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <button onclick="handleLogoClick()" class="text-xl sm:text-2xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent text-left">
                 GEORG<span class="text-white"> TECH & SHOP</span>
             </button>
 
-            <nav class="flex items-center space-x-6 text-sm font-semibold">
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
                 <button onclick="showPage('shop')" class="hover:text-indigo-400 transition">Shop</button>
                 <button onclick="showPage('repair')" class="hover:text-indigo-400 transition">Reparatur-Service</button>
                 
@@ -51,16 +52,37 @@
                     🛒 <span id="cartBadge" class="ml-1 bg-indigo-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">0</span>
                 </button>
             </nav>
+
+            <!-- Mobile Burger & Warenkorb Button -->
+            <div class="flex items-center space-x-3 md:hidden">
+                <button onclick="showPage('cart')" class="relative p-2.5 bg-gray-900/80 rounded-2xl border border-gray-800">
+                    🛒 <span id="cartBadgeMobile" class="ml-1 bg-indigo-500 text-white px-1.5 py-0.5 rounded-full text-xs font-bold">0</span>
+                </button>
+                <button onclick="toggleMobileMenu()" class="p-2.5 bg-gray-950/80 border border-gray-800 rounded-2xl text-gray-300 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menü -->
+        <div id="mobileMenu" class="hidden md:hidden bg-gray-900/95 border-b border-gray-800 px-6 py-4 space-y-3 font-semibold text-sm">
+            <button onclick="showPage('shop'); toggleMobileMenu();" class="block w-full text-left py-2 hover:text-indigo-400">Shop</button>
+            <button onclick="showPage('repair'); toggleMobileMenu();" class="block w-full text-left py-2 hover:text-indigo-400">Reparatur-Service</button>
+            <div id="authNavContainerMobile" class="pt-2">
+                <button onclick="showPage('auth'); toggleMobileMenu();" class="w-full bg-indigo-600 py-2.5 rounded-xl text-center">Login / Registrieren</button>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-12 flex-grow w-full space-y-16 relative z-10">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-grow w-full space-y-12 relative z-10">
 
         <!-- SEITE 1: SHOP MIT BUNTE KATEGORIEN -->
         <section id="page-shop" class="space-y-8">
             <div class="text-center max-w-4xl mx-auto space-y-4">
-                <h1 class="text-5xl font-black mb-2 tracking-tight">Willkommen bei <span class="bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent">Georg Tech & Shop</span></h1>
-                <p class="text-gray-400 text-lg">Entdecken Sie unsere große Auswahl an Tech-Zubehör, Ersatzteilen und Gadgets.</p>
+                <h1 class="text-3xl sm:text-5xl font-black mb-2 tracking-tight">Willkommen bei <span class="bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent">Georg Tech & Shop</span></h1>
+                <p class="text-gray-400 text-base sm:text-lg">Entdecken Sie unsere große Auswahl an Tech-Zubehör, Ersatzteilen und Gadgets.</p>
                 
                 <!-- Suche -->
                 <div class="relative max-w-md mx-auto pt-2">
@@ -68,28 +90,28 @@
                 </div>
 
                 <!-- Bunte Kategorien Buttons -->
-                <div class="flex flex-wrap justify-center gap-2.5 pt-4">
-                    <button onclick="setCategoryFilter('all')" class="cat-btn active bg-gradient-to-r from-gray-700 to-gray-800 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg transition transform hover:scale-105">✨ Alle</button>
-                    <button onclick="setCategoryFilter('Handyhüllen')" class="cat-btn bg-gradient-to-r from-pink-600 to-rose-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-pink-600/20 transition transform hover:scale-105">📱 Handyhüllen</button>
-                    <button onclick="setCategoryFilter('Laptops')" class="cat-btn bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition transform hover:scale-105">💻 Laptops</button>
-                    <button onclick="setCategoryFilter('Smart Home')" class="cat-btn bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-purple-600/20 transition transform hover:scale-105">🏠 Smart Home</button>
-                    <button onclick="setCategoryFilter('3D-Druck')" class="cat-btn bg-gradient-to-r from-amber-600 to-orange-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-amber-600/20 transition transform hover:scale-105">🖨️ 3D Gedruckte Teile</button>
-                    <button onclick="setCategoryFilter('Ersatzteile')" class="cat-btn bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/20 transition transform hover:scale-105">🛠️ Ersatzteile</button>
-                    <button onclick="setCategoryFilter('Datenkabel')" class="cat-btn bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-cyan-600/20 transition transform hover:scale-105">🔌 Datenkabel</button>
-                    <button onclick="setCategoryFilter('Ladegeräte')" class="cat-btn bg-gradient-to-r from-yellow-600 to-amber-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-yellow-600/20 transition transform hover:scale-105">⚡ Ladegeräte</button>
-                    <button onclick="setCategoryFilter('Speichermedium')" class="cat-btn bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-fuchsia-600/20 transition transform hover:scale-105">💾 Speichermedium</button>
-                    <button onclick="setCategoryFilter('Drucker & Verbrauchsmaterial')" class="cat-btn bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-red-600/20 transition transform hover:scale-105">🖨️ Drucker & Verbrauchsmaterial</button>
+                <div class="flex flex-wrap justify-center gap-2 pt-4">
+                    <button onclick="setCategoryFilter('all')" class="cat-btn active bg-gradient-to-r from-gray-700 to-gray-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg transition transform hover:scale-105">✨ Alle</button>
+                    <button onclick="setCategoryFilter('Handyhüllen')" class="cat-btn bg-gradient-to-r from-pink-600 to-rose-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-pink-600/20 transition transform hover:scale-105">📱 Handyhüllen</button>
+                    <button onclick="setCategoryFilter('Laptops')" class="cat-btn bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition transform hover:scale-105">💻 Laptops</button>
+                    <button onclick="setCategoryFilter('Smart Home')" class="cat-btn bg-gradient-to-r from-purple-600 to-violet-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-purple-600/20 transition transform hover:scale-105">🏠 Smart Home</button>
+                    <button onclick="setCategoryFilter('3D-Druck')" class="cat-btn bg-gradient-to-r from-amber-600 to-orange-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-amber-600/20 transition transform hover:scale-105">🖨️ 3D Gedruckte Teile</button>
+                    <button onclick="setCategoryFilter('Ersatzteile')" class="cat-btn bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/20 transition transform hover:scale-105">🛠️ Ersatzteile</button>
+                    <button onclick="setCategoryFilter('Datenkabel')" class="cat-btn bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-cyan-600/20 transition transform hover:scale-105">🔌 Datenkabel</button>
+                    <button onclick="setCategoryFilter('Ladegeräte')" class="cat-btn bg-gradient-to-r from-yellow-600 to-amber-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-yellow-600/20 transition transform hover:scale-105">⚡ Ladegeräte</button>
+                    <button onclick="setCategoryFilter('Speichermedium')" class="cat-btn bg-gradient-to-r from-fuchsia-600 to-pink-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-fuchsia-600/20 transition transform hover:scale-105">💾 Speichermedium</button>
+                    <button onclick="setCategoryFilter('Drucker & Verbrauchsmaterial')" class="cat-btn bg-gradient-to-r from-red-600 to-orange-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-red-600/20 transition transform hover:scale-105">🖨️ Drucker & Verbrauchsmaterial</button>
                 </div>
             </div>
             
-            <!-- Vertikales Produkt-Raster -->
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            <!-- Vertikales Produkt-Raster (Optimiert für Mobile: 1 Spalte auf Handy, 2 auf Tablet, 4 auf PC) -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
         </section>
 
         <!-- SEITE 2: REPARATUR-SERVICE -->
-        <section id="page-repair" class="hidden max-w-3xl mx-auto space-y-8 bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl">
+        <section id="page-repair" class="hidden max-w-3xl mx-auto space-y-8 bg-gray-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-gray-800 shadow-2xl">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl font-black text-indigo-400">🔧 Handy & Laptop Reparatur-Anfrage</h2>
+                <h2 class="text-2xl sm:text-3xl font-black text-indigo-400">🔧 Handy & Laptop Reparatur-Anfrage</h2>
                 <p class="text-gray-400 text-sm">Egal ob Display-Schaden, Akku-Wechsel oder Software-Problem – senden Sie uns eine schnelle Anfrage.</p>
             </div>
 
@@ -131,16 +153,16 @@
         </section>
 
         <!-- SEITE 3: PRODUKT-DETAILANSICHT -->
-        <section id="page-detail" class="hidden max-w-4xl mx-auto space-y-8 bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl">
+        <section id="page-detail" class="hidden max-w-4xl mx-auto space-y-8 bg-gray-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-gray-800 shadow-2xl">
             <button onclick="showPage('shop')" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-2xl text-sm font-bold transition">← Zurück zum Shop</button>
             <div id="detailContent" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center"></div>
         </section>
 
         <!-- SEITE 4: ADMIN PANEL -->
         <section id="page-admin" class="hidden space-y-10">
-            <div class="flex justify-between items-center bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-indigo-500/30 shadow-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-900/60 backdrop-blur-xl p-6 rounded-3xl border border-indigo-500/30 shadow-2xl">
                 <div>
-                    <h2 class="text-3xl font-black text-indigo-400">🔒 Admin-Konsole & Statistik</h2>
+                    <h2 class="text-2xl sm:text-3xl font-black text-indigo-400">🔒 Admin-Konsole & Statistik</h2>
                     <p class="text-sm text-gray-400">Georg Tech & Shop Verwaltung & Abrechnung</p>
                 </div>
                 <button onclick="showPage('shop')" class="bg-gray-800 hover:bg-gray-700 px-4 py-2.5 rounded-2xl text-sm font-bold transition">Verlassen</button>
@@ -177,10 +199,10 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
+                <div class="bg-gray-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xl font-bold">Neues Produkt / Teil hinzufügen</h3>
-                        <span id="productSuccessMsg" class="text-xs text-green-400 font-semibold hidden bg-green-950/60 px-3 py-1 rounded-xl border border-green-800">✅ Erfolgreich gespeichert!</span>
+                        <span id="productSuccessMsg" class="text-xs text-green-400 font-semibold hidden bg-green-950/60 px-3 py-1 rounded-xl border border-green-800">✅ Gespeichert!</span>
                     </div>
                     <form id="addProductForm" onsubmit="handleCreateProduct(event)" class="space-y-4">
                         <div>
@@ -206,27 +228,27 @@
                             <input type="number" step="0.01" id="prodPrice" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-3.5 text-white focus:outline-none focus:border-indigo-500 transition">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-400 mb-1">Produktbild von Festplatte hochladen</label>
+                            <label class="block text-sm text-gray-400 mb-1">Produktbild hochladen</label>
                             <input type="file" id="prodImgFile" accept="image/*" required class="w-full bg-gray-800/80 border border-gray-700 rounded-2xl p-2.5 text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 transition">
                         </div>
                         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">Produkt speichern</button>
                     </form>
                 </div>
 
-                <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
+                <div class="bg-gray-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
                     <h3 class="text-xl font-bold">Produkte verwalten</h3>
                     <div id="adminProductsList" class="space-y-3 max-h-[350px] overflow-y-auto pr-2"></div>
                 </div>
             </div>
 
-            <div class="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
+            <div class="bg-gray-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-gray-800 shadow-xl space-y-6">
                 <h3 class="text-xl font-bold">Bestellungen verwalten</h3>
                 <div id="adminOrdersList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
             </div>
         </section>
 
         <!-- SEITE 5: LOGIN / REGISTRIERUNG -->
-        <section id="page-auth" class="hidden max-w-md mx-auto bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl">
+        <section id="page-auth" class="hidden max-w-md mx-auto bg-gray-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-gray-800 shadow-2xl">
             <h2 class="text-2xl font-bold mb-6 text-center" id="authTitle">Anmelden</h2>
             <form onsubmit="handleAuth(event)" class="space-y-4">
                 <div>
@@ -269,7 +291,7 @@
                 </div>
                 <div class="flex justify-between items-center pb-2">
                     <span class="text-gray-200 font-bold">Gesamtsumme (inkl. MwSt. & Versand):</span>
-                    <span id="cartTotalSum" class="text-2xl font-black text-indigo-400">0,00 €</span>
+                    <span id="cartTotalSum" class="text-xl sm:text-2xl font-black text-indigo-400">0,00 €</span>
                 </div>
                 <h3 class="text-xl font-bold pt-2">Zahlung abwickeln</h3>
                 <div id="paypal-button-container" class="mt-4"></div>
@@ -279,7 +301,7 @@
     </main>
 
     <!-- KONTAKT-BEREICH -->
-    <section class="border-t border-gray-800/80 bg-gray-900/30 backdrop-blur-md py-12 px-6 mt-auto relative z-10">
+    <section class="border-t border-gray-800/80 bg-gray-900/30 backdrop-blur-md py-12 px-4 sm:px-6 mt-auto relative z-10">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div class="space-y-3">
                 <h3 class="text-xl font-bold text-indigo-400">Georg Tech & Shop Support</h3>
@@ -337,18 +359,21 @@
         let isRegisterMode = false;
         let selectedCategory = 'all';
 
-        // Funktion für den schwebenden Design-Ballon (Toast)
+        // Funktion zum Ein-/Ausblenden des mobilen Burger-Menüs
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
         let toastTimeout = null;
         function showToast(title, desc) {
             const toast = document.getElementById('toastNotification');
             document.getElementById('toastTitle').innerText = title;
             document.getElementById('toastDesc').innerText = desc;
 
-            // Einblenden
             toast.classList.remove('translate-y-24', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
 
-            // Nach 3 Sekunden automatisch ausblenden
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
@@ -358,10 +383,15 @@
 
         auth.onAuthStateChanged((user) => {
             const container = document.getElementById('authNavContainer');
+            const containerMobile = document.getElementById('authNavContainerMobile');
             if (user) {
-                container.innerHTML = `<button onclick="handleLogout()" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-4 py-2 rounded-2xl transition font-semibold">Abmelden</button>`;
+                const logoutHTML = `<button onclick="handleLogout()" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-4 py-2 rounded-2xl transition font-semibold w-full">Abmelden</button>`;
+                if(container) container.innerHTML = logoutHTML;
+                if(containerMobile) containerMobile.innerHTML = logoutHTML;
             } else {
-                container.innerHTML = `<button onclick="showPage('auth')" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-2xl shadow-lg shadow-indigo-600/20 transition">Login / Registrieren</button>`;
+                const loginHTML = `<button onclick="showPage('auth')" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-2xl shadow-lg shadow-indigo-600/20 transition w-full">Login / Registrieren</button>`;
+                if(container) container.innerHTML = loginHTML;
+                if(containerMobile) containerMobile.innerHTML = loginHTML;
             }
         });
 
@@ -424,11 +454,11 @@
 
             const container = document.getElementById('detailContent');
             container.innerHTML = `
-                <img src="${prod.image}" class="w-full h-80 object-cover rounded-2xl shadow-2xl">
+                <img src="${prod.image}" class="w-full h-64 sm:h-80 object-cover rounded-2xl shadow-2xl">
                 <div class="space-y-6">
                     <span class="bg-indigo-600/20 text-indigo-400 text-xs px-3 py-1 rounded-full font-bold">${prod.category || 'Produkt'}</span>
-                    <h2 class="text-3xl font-black text-white">${prod.name}</h2>
-                    <p class="text-3xl font-black text-indigo-400">${prod.price.toFixed(2)} €</p>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white">${prod.name}</h2>
+                    <p class="text-2xl sm:text-3xl font-black text-indigo-400">${prod.price.toFixed(2)} €</p>
                     <p class="text-gray-400 text-sm leading-relaxed">Erleben Sie höchste Qualität mit diesem exklusiven Artikel aus dem Georg Tech & Shop. Schnell, sicher und zuverlässig geliefert.</p>
                     <div class="flex space-x-4">
                         <button onclick="addToCart('${prod.id}')" class="flex-grow bg-indigo-600 hover:bg-indigo-500 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-600/20 transition">In den Warenkorb</button>
@@ -799,7 +829,6 @@
                     cart.push({ ...prod, quantity: 1 });
                 }
                 updateCartBadge();
-                // Schöner Ballon statt alert()
                 showToast(prod.name, 'Erfolgreich zum Warenkorb hinzugefügt!');
             }
         }
@@ -819,6 +848,7 @@
         function updateCartBadge() {
             const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
             document.getElementById('cartBadge').innerText = totalCount;
+            document.getElementById('cartBadgeMobile').innerText = totalCount;
         }
 
         function renderCart() {
