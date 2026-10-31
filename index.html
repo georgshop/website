@@ -44,6 +44,10 @@
             <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
                 <button onclick="showPage('shop')" class="hover:text-indigo-400 transition">Shop</button>
                 <button onclick="showPage('repair')" class="hover:text-indigo-400 transition">Reparatur-Service</button>
+                
+                <!-- Admin Button (Standardmäßig versteckt, wird erst nach Anmeldung eingeblendet) -->
+                <button id="navAdminBtn" onclick="showPage('admin')" class="hidden hover:text-indigo-400 transition text-indigo-400 font-bold">⚙️ Admin</button>
+
                 <div id="dynamicNavLinks" class="flex items-center space-x-6"></div>
                 
                 <!-- Anzeige des angemeldeten Mitarbeiters/Chefs oben rechts -->
@@ -80,6 +84,7 @@
         <div id="mobileMenu" class="hidden md:hidden bg-gray-900/95 border-b border-gray-800 px-6 py-4 space-y-3 font-semibold text-sm">
             <button onclick="showPage('shop'); toggleMobileMenu();" class="block w-full text-left py-2 hover:text-indigo-400">Shop</button>
             <button onclick="showPage('repair'); toggleMobileMenu();" class="block w-full text-left py-2 hover:text-indigo-400">Reparatur-Service</button>
+            <button id="mobileAdminBtn" onclick="showPage('admin'); toggleMobileMenu();" class="hidden block w-full text-left py-2 text-indigo-400 font-bold">⚙️ Admin-Konsole</button>
             <div id="dynamicNavLinksMobile" class="space-y-2"></div>
             <div id="authNavContainerMobile" class="pt-2">
                 <button onclick="showPage('auth'); toggleMobileMenu();" class="w-full bg-indigo-600 py-2.5 rounded-xl text-center">Login / Registrieren</button>
@@ -547,27 +552,32 @@
         let selectedCategory = 'all';
         let appliedDiscount = null;
 
-        let currentLoggedInAdmin = sessionStorage.getItem('currentLoggedInAdmin') || null;
-        let isChefUser = sessionStorage.getItem('isChefUser') === 'true';
+        let currentLoggedInAdmin = localStorage.getItem('currentLoggedInAdmin') || null;
+        let isChefUser = localStorage.getItem('isChefUser') === 'true';
 
         function updateAdminBadge() {
             const badge = document.getElementById('activeUserBadge');
             const nameEl = document.getElementById('activeUserNameDisplay');
+            const adminBtn = document.getElementById('navAdminBtn');
+            const mobileAdminBtn = document.getElementById('mobileAdminBtn');
+
             if (currentLoggedInAdmin) {
-                badge.classList.remove('hidden');
-                badge.classList.add('flex');
-                nameEl.innerText = currentLoggedInAdmin;
+                if (badge) { badge.classList.remove('hidden'); badge.classList.add('flex'); }
+                if (nameEl) nameEl.innerText = currentLoggedInAdmin;
+                if (adminBtn) adminBtn.classList.remove('hidden');
+                if (mobileAdminBtn) mobileAdminBtn.classList.remove('hidden');
             } else {
-                badge.classList.remove('flex');
-                badge.classList.add('hidden');
+                if (badge) { badge.classList.remove('flex'); badge.classList.add('hidden'); }
+                if (adminBtn) adminBtn.classList.add('hidden');
+                if (mobileAdminBtn) mobileAdminBtn.classList.add('hidden');
             }
         }
 
         function logoutAdmin() {
             currentLoggedInAdmin = null;
             isChefUser = false;
-            sessionStorage.removeItem('currentLoggedInAdmin');
-            sessionStorage.removeItem('isChefUser');
+            localStorage.removeItem('currentLoggedInAdmin');
+            localStorage.removeItem('isChefUser');
             updateAdminBadge();
             showToast("Abgemeldet", "Sie haben die Admin-Konsole verlassen.");
             showPage('shop');
@@ -739,7 +749,7 @@
 
             const newVac = {
                 id: 'vac-' + Date.now(),
-                staffName: currentLoggedInAdmin,
+                staffName: currentLoggedInAdmin || "Mitarbeiter",
                 start: start,
                 end: end,
                 status: 'Ausstehend'
@@ -780,7 +790,6 @@
                     <div class="flex items-center space-x-2">
                         <span class="px-2.5 py-1 rounded-lg font-bold ${v.status === 'Genehmigt' ? 'bg-green-600/20 text-green-400' : v.status === 'Abgelehnt' ? 'bg-red-600/20 text-red-400' : 'bg-amber-600/20 text-amber-400'}">${v.status}</span>
                         
-                        <!-- NUR DER CHEF SIEHT DIE GENEHMIGUNGS-BUTTONS ✔ / ✖ -->
                         ${isChefUser ? `
                             <button onclick="updateVacationStatus('${v.id}', 'Genehmigt')" class="bg-green-600 hover:bg-green-500 text-white px-2.5 py-1 rounded-lg font-bold text-sm shadow transition" title="Genehmigen">✔</button>
                             <button onclick="updateVacationStatus('${v.id}', 'Abgelehnt')" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded-lg font-bold text-sm shadow transition" title="Ablehnen">✖</button>
@@ -917,7 +926,7 @@
             if (!task) return;
 
             if (!isChefUser && task.assignee !== currentLoggedInAdmin) {
-                alert("Fehler: Sie dürfen keine Aufgaben von anderen Mitarbeiter bearbeiten!");
+                alert("Fehler: Sie dürfen keine Aufgaben von anderen Mitarbeitern bearbeiten!");
                 renderAdminTasks();
                 return;
             }
@@ -990,12 +999,17 @@
         }
 
         function checkAdminAccess() {
+            if (currentLoggedInAdmin) {
+                showPage('admin');
+                return;
+            }
+
             const enteredPass = prompt("Bitte geben Sie Ihr Passwort ein (Chef oder Mitarbeiter):");
             if (enteredPass === ADMIN_PASSWORD) {
                 currentLoggedInAdmin = "Georg (Chef)";
                 isChefUser = true;
-                sessionStorage.setItem('currentLoggedInAdmin', currentLoggedInAdmin);
-                sessionStorage.setItem('isChefUser', 'true');
+                localStorage.setItem('currentLoggedInAdmin', currentLoggedInAdmin);
+                localStorage.setItem('isChefUser', 'true');
                 updateAdminBadge();
                 showPage('admin');
             } else {
@@ -1003,8 +1017,8 @@
                 if (foundStaff) {
                     currentLoggedInAdmin = foundStaff.name;
                     isChefUser = false;
-                    sessionStorage.setItem('currentLoggedInAdmin', currentLoggedInAdmin);
-                    sessionStorage.setItem('isChefUser', 'false');
+                    localStorage.setItem('currentLoggedInAdmin', currentLoggedInAdmin);
+                    localStorage.setItem('isChefUser', 'false');
                     updateAdminBadge();
                     showToast("Willkommen", "Angemeldet als: " + foundStaff.name);
                     showPage('admin');
