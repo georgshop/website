@@ -10,12 +10,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AcFbOAwcpR1--nzQLF7KYeS2gWzEwUAL3RlYIniv8qifry_SWNr-9pw2CtPaPqmaGBE6KaxjcCPrtl&currency=EUR"></script>
+    <!-- PayPal SDK mit Ihrer neuen Client-ID -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcFbOAwcpR1--nzQLF7KYeS2gWzEwUAL3RlYIniv8qifry_SWNr-9pw2CtPaPqmaGBE6KaxjcCPxkrtl&currency=EUR"></script>
     <!-- jsPDF Bibliothek -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Ihr persönlicher Tidio Live-Chat -->
+    <!-- Tidio Live-Chat -->
     <script src="//code.tidio.co/utgmqqpyycvublp4fmvvxie0vlwzgnbp.js" async></script>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
@@ -45,7 +45,7 @@
                 <button onclick="showPage('shop')" class="hover:text-indigo-400 transition">Shop</button>
                 <button onclick="showPage('repair')" class="hover:text-indigo-400 transition">Reparatur-Service</button>
                 
-                <!-- Admin Button (Standardmäßig versteckt, wird erst nach Anmeldung eingeblendet) -->
+                <!-- Admin Button (Nur nach Chef-Anmeldung sichtbar) -->
                 <button id="navAdminBtn" onclick="showPage('admin')" class="hidden hover:text-indigo-400 transition text-indigo-400 font-bold">⚙️ Admin</button>
 
                 <div id="dynamicNavLinks" class="flex items-center space-x-6"></div>
@@ -741,7 +741,6 @@
             }
         }
 
-        // URLAUBSPLAN & ARBEITSPLAN LOGIK
         function handleVacationRequest(e) {
             e.preventDefault();
             const start = document.getElementById('vacStart').value;
@@ -845,7 +844,6 @@
             }).join('');
         }
 
-        // AUFGABEN-FUNKTIONEN
         function handleCreateTask(e) {
             e.preventDefault();
             if (!isChefUser) {
